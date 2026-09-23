@@ -1,0 +1,26 @@
+{
+  "name": "shazzoo/captcha-plugin",
+  "description": "Captcha for Content Studio Core: honeypot, signed timing and a pluggable challenge provider.",
+  "type": "content-studio-plugin",
+  "license": "proprietary",
+  "require": {
+    "php": "^8.3",
+    "shazzoo/content-studio-core": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Shazzoo\\Captcha\\": "src/"
+    }
+  },
+  "extra": {
+    "content-studio": {
+      "key": "shazzoo/captcha",
+      "slug": "captcha",
+      "name": "Captcha",
+      "description": "Keeps bots off the public forms: a honeypot, a signed timing check and an optional challenge provider.",
+      "provider": "Shazzoo\\Captcha\\CaptchaServiceProvider"
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

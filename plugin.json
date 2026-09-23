@@ -1,0 +1,9 @@
+{
+  "key": "shazzoo/captcha",
+  "slug": "captcha",
+  "name": "Captcha",
+  "description": "Keeps bots off the public forms: a honeypot, a signed timing check and an optional challenge provider.",
+  "author": "Shazzoo",
+  "provider": "Shazzoo\\Captcha\\CaptchaServiceProvider",
+  "class": "Shazzoo\\Captcha\\Plugin"
+}
