@@ -24,51 +24,48 @@ return [
      * captcha-plugin haakt zichzelf in op de naam hieronder. Zo blijft een
      * plugin werken als deze plugin er niet is.
      *
-     * error_field: het validatieveld waar de melding op komt te staan, zodat
-     * die verschijnt in de foutweergave die het component toch al heeft.
+     * Standaard leeg: een site die een component wil bewaken, zet dit in
+     * zijn eigen config/captcha.php. Per component, op de naam waarmee het
+     * geregistreerd is:
+     *
+     *     'naam.van.component' => [
+     *         'methods' => ['submit'],     // de acties die bewaakt worden
+     *         'error_field' => 'email',    // het validatieveld voor de melding,
+     *                                      // zodat die verschijnt in de
+     *                                      // foutweergave die het component al heeft
+     *         'context' => 'mijn-formulier', // sleutel in actions hieronder
+     *
+     *         // Waar de widget terechtkomt: een CSS-selector op de pagina. Het
+     *         // component plaatst hem niet zelf, dus zonder dit hangt hij
+     *         // onderaan de pagina. Matcht de selector niets, dan blijft hij
+     *         // daar staan en blijft alles werken. Bewust geen selector met
+     *         // wire:submit erin -- die breekt zodra de modifier verandert.
+     *         'widget_selector' => 'form button[type="submit"]',
+     *         'widget_position' => 'before', // append, prepend, before of after
+     *     ],
+     *
+     * Let op: een eigen config/captcha.php vervangt deze sleutel in zijn
+     * geheel, en actions ook; neem daar 'default' => 'contact' dus mee.
      */
-    'livewire' => [
-        'profiler.scan' => [
-            'methods' => ['submit'],
-            'error_field' => 'domain',
-            'context' => 'profiler-scan',
-
-            /*
-             * Waar de widget terechtkomt. Zonder dit hangt hij onderaan de
-             * pagina, want het bewaakte component plaatst hem niet zelf -- dat
-             * is nu juist het punt. Een CSS-selector op deze pagina; de widget
-             * wordt daar na het renderen naartoe verplaatst. Matcht de selector
-             * niets, dan blijft hij onderaan staan en blijft alles werken.
-             *
-             * Standaard vlak boven de verstuurknop: dat is waar een bezoeker
-             * hem verwacht. Bewust geen selector met wire:submit erin -- die
-             * breekt zodra de modifier (.prevent) verandert.
-             */
-            'widget_selector' => 'form button[type="submit"]',
-            'widget_position' => 'before', // append, prepend, before of after
-        ],
-    ],
+    'livewire' => [],
 
     /*
-     * Wat te doen als de provider onbereikbaar is. Per formulier, want de
-     * afweging verschilt: een gemiste contactaanvraag kost een lead, een
-     * ongecontroleerde scan kost scraping- en LLM-spend bij de profiler.
+     * Wat te doen als de provider onbereikbaar is: doorlaten (true) of
+     * weigeren (false). Geldt voor alle bewaakte formulieren. De verborgen
+     * controles (honeypot en tijd) blijven in beide gevallen gelden.
      */
-    'fail_open' => [
-        'default' => true,
-        'profiler-scan' => false,
-    ],
+    'fail_open' => (bool) env('CAPTCHA_FAIL_OPEN', true),
 
     /*
      * Welk formulier welk token mag opleveren. Turnstile stuurt de action mee
-     * terug bij siteverify, dus zo is een token van het contactformulier niet
-     * te hergebruiken voor een scan -- en juist die kost geld.
+     * terug bij siteverify, dus zo is een token van het ene formulier niet te
+     * hergebruiken voor een ander. De sleutel is de context uit livewire
+     * hierboven; 'default' geldt voor de routes in protect.
      *
      * Toegestaan: 1-32 tekens, letters, cijfers, _ en -.
      */
     'actions' => [
         'default' => 'contact',
-        'profiler-scan' => 'scan',
     ],
 
     'providers' => [

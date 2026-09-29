@@ -51,8 +51,7 @@ class CaptchaSettingsPage extends Page
             'provider' => (string) config('captcha.provider'),
             'honeypot_enabled' => (bool) config('captcha.honeypot.enabled'),
             'protect' => (array) config('captcha.protect'),
-            'fail_open_default' => (bool) config('captcha.fail_open.default'),
-            'fail_open_scan' => (bool) config('captcha.fail_open.profiler-scan'),
+            'fail_open' => (bool) config('captcha.fail_open'),
         ], CaptchaSettings::all()));
     }
 
@@ -139,16 +138,11 @@ class CaptchaSettingsPage extends Page
 
                 Section::make('Als Cloudflare onbereikbaar is')
                     ->collapsible()
-                    ->description('Een storing bij de aanbieder mag niet stilletjes je formulieren dichtzetten -- en ook niet stilletjes je budget opmaken. Elke keer dat dit gebeurt komt in het log.')
-                    ->columns(2)
+                    ->description('Elke keer dat dit gebeurt komt in het log.')
                     ->schema([
-                        Toggle::make('fail_open_default')
-                            ->label('Contactformulier doorlaten')
-                            ->helperText('Aan: een gemiste aanvraag kost een klant, dus liever doorlaten. De verborgen controles gelden dan nog steeds.'),
-
-                        Toggle::make('fail_open_scan')
-                            ->label('Websitescan doorlaten')
-                            ->helperText('Uit: elke scan kost geld bij de profiler, dus bij twijfel niet starten.'),
+                        Toggle::make('fail_open')
+                            ->label('Inzendingen doorlaten')
+                            ->helperText('Aan: formulieren blijven werken als Cloudflare wegvalt; de verborgen controles gelden dan nog steeds. Uit: inzendingen worden geweigerd tot Cloudflare terug is.'),
                     ]),
             ])
             ->statePath('data');

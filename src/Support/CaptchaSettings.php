@@ -32,8 +32,7 @@ final class CaptchaSettings
         'min_seconds' => 'captcha.honeypot.min_seconds',
         'max_minutes' => 'captcha.honeypot.max_minutes',
         'protect' => 'captcha.protect',
-        'fail_open_default' => 'captcha.fail_open.default',
-        'fail_open_scan' => 'captcha.fail_open.profiler-scan',
+        'fail_open' => 'captcha.fail_open',
     ];
 
     /**
@@ -47,8 +46,7 @@ final class CaptchaSettings
         'protect',
         'min_seconds',
         'honeypot_enabled',
-        'fail_open_default',
-        'fail_open_scan',
+        'fail_open',
     ];
 
     /**

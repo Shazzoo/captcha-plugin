@@ -10,8 +10,8 @@ interface CaptchaProvider
      * Mag deze inzending door?
      *
      * Gooit een exception als de provider zelf onbereikbaar is -- dat is iets
-     * anders dan een afgewezen bezoeker, en de Guard beslist per formulier wat
-     * er dan gebeurt (zie config captcha.fail_open).
+     * anders dan een afgewezen bezoeker, en de Guard beslist wat er dan
+     * gebeurt (zie config captcha.fail_open).
      */
     public function verify(?string $token, Request $request, ?string $expectedAction = null): bool;
 

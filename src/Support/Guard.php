@@ -10,7 +10,7 @@ use Throwable;
 /**
  * De enige plek waar de lagen op volgorde langskomen. Middleware en de
  * Livewire-trait doen allebei niets anders dan dit aanroepen, zodat een
- * contactformulier en een scan dezelfde regels krijgen.
+ * gewoon formulier en een Livewire-component dezelfde regels krijgen.
  */
 class Guard
 {
@@ -18,7 +18,7 @@ class Guard
 
     /**
      * @param  array<string, mixed>  $input  de ingezonden velden
-     * @param  string  $context  sleutel in captcha.fail_open
+     * @param  string  $context  welk formulier: bepaalt de action in captcha.actions
      */
     public function check(array $input, Request $request, string $context = 'default'): Result
     {
@@ -58,7 +58,7 @@ class Guard
 
     private function onProviderFailure(Throwable $e, Request $request, string $context): Result
     {
-        $failOpen = (bool) (config('captcha.fail_open.'.$context) ?? config('captcha.fail_open.default', true));
+        $failOpen = (bool) config('captcha.fail_open', true);
 
         // Altijd loggen: een provider die stilletjes wegvalt terwijl wij
         // doorlaten, is precies het soort storing dat je pas maanden later ziet.
@@ -74,7 +74,7 @@ class Guard
 
     private function reject(string $layer, string $messageKey, Request $request): Result
     {
-        // Geen berichtinhoud in de logs, conform de keuze in de profiler-plugin.
+        // Geen berichtinhoud in de logs: alleen welke laag weigerde en het IP.
         Log::info('Captcha rejected a submission', [
             'layer' => $layer,
             'ip' => $request->ip(),
