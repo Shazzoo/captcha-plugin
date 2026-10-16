@@ -40,6 +40,8 @@ return [
      *         // onderaan de pagina. Matcht de selector niets, dan blijft hij
      *         // daar staan en blijft alles werken. Bewust geen selector met
      *         // wire:submit erin -- die breekt zodra de modifier verandert.
+     *         // Een plek binnen het component mag: haalt Livewire de widget
+     *         // bij een update weg, dan zet captcha.js hem terug.
      *         'widget_selector' => 'form button[type="submit"]',
      *         'widget_position' => 'before', // append, prepend, before of after
      *     ],

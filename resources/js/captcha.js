@@ -67,13 +67,25 @@ window.captchaRenderWidgets = function () {
  * Matcht de selector niets, dan blijft hij staan waar hij staat -- zichtbaar
  * op een rare plek is nog altijd beter dan een challenge die niemand kan
  * oplossen.
+ *
+ * Ligt die plek binnen het Livewire-component, dan haalt Livewire de widget
+ * bij elke update (een upload, een validatiefout) weer uit de pagina: hij komt
+ * niet uit de template van het component. Daarom wordt hij na elke morph
+ * teruggezet. Is de plek er even niet (de knop staat in een @if), dan wacht
+ * hij buiten de pagina tot die terugkomt.
  */
 function captchaMoveWidget() {
-    var wrapper = document.querySelector('[data-captcha-livewire]');
+    var wrapper = captchaLivewireWrapper();
 
-    if (! wrapper || ! wrapper.dataset.mountSelector || wrapper.dataset.captchaMoved) {
+    if (! wrapper || ! wrapper.dataset.mountSelector) {
         return;
     }
+
+    if (wrapper.isConnected && wrapper.dataset.captchaMoved) {
+        return;
+    }
+
+    var returning = Boolean(wrapper.dataset.captchaMoved);
 
     var target;
 
@@ -102,6 +114,47 @@ function captchaMoveWidget() {
     }
 
     wrapper.dataset.captchaMoved = '1';
+
+    if (returning) {
+        captchaRenderAgain(wrapper);
+    }
+}
+
+/**
+ * De Livewire-widget, onthouden zodra hij gevonden is: nadat morph hem uit de
+ * pagina heeft gehaald, vindt querySelector hem niet meer, maar het token en
+ * de honeypot staan er nog in.
+ */
+var captchaWrapper = null;
+
+function captchaLivewireWrapper() {
+    if (! captchaWrapper) {
+        captchaWrapper = document.querySelector('[data-captcha-livewire]');
+    }
+
+    return captchaWrapper;
+}
+
+/**
+ * Een iframe die uit de pagina is geweest, laadt opnieuw en is daarna geen
+ * werkende challenge meer. Dus een verse widget; het token dat er al stond
+ * blijft geldig tot de nieuwe het vervangt.
+ */
+function captchaRenderAgain(wrapper) {
+    if (! window.turnstile) {
+        return;
+    }
+
+    wrapper.querySelectorAll('[data-captcha-target]').forEach(function (el) {
+        if (el.dataset.captchaWidgetId) {
+            window.turnstile.remove(el.dataset.captchaWidgetId);
+        }
+
+        delete el.dataset.captchaWidgetId;
+        delete el.dataset.captchaRendered;
+    });
+
+    window.captchaRenderWidgets();
 }
 
 document.addEventListener('DOMContentLoaded', captchaMoveWidget);
@@ -111,7 +164,7 @@ document.addEventListener('livewire:init', function () {
     window.Livewire.hook('morphed', captchaMoveWidget);
 
     window.Livewire.hook('request', function (payload) {
-        var wrapper = document.querySelector('[data-captcha-livewire]');
+        var wrapper = captchaLivewireWrapper();
 
         if (! wrapper || ! payload.options || ! payload.options.headers) {
             return;
@@ -127,7 +180,7 @@ document.addEventListener('livewire:init', function () {
     // Na een afwijzing is het token verbruikt; de server vraagt via dit event
     // om een verse challenge.
     window.Livewire.on('captcha-reset', function () {
-        var wrapper = document.querySelector('[data-captcha-livewire]');
+        var wrapper = captchaLivewireWrapper();
 
         if (wrapper) {
             delete wrapper.dataset.token;
